@@ -31,7 +31,6 @@ export const routes = [
         description,
         completed_at: null,
         created_at: new Date(),
-        updated_at: new Date()
       }
 
       database.insert('tasks', task)
@@ -65,9 +64,17 @@ export const routes = [
       const { id } = req.params
       const { title, description } = req.body
 
+      const existingTask = database.select('tasks', { id })[0]
+
+      if (!existingTask) {
+        return res.writeHead(404).end()
+      }
+
       database.update('tasks', id, {
-        title,
-        description,
+        title: title || existingTask.title,
+        description: description || existingTask.description,
+        completed_at: existingTask.completed_at,
+        created_at: existingTask.created_at,
         updated_at: new Date()
       })
 
