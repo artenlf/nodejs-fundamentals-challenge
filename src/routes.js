@@ -43,7 +43,6 @@ export const routes = [
     path: buildRoutePath('/tasks/:id/complete'),
     handler: (req, res) => {
       const { id } = req.params
-      const completed_at = req.body
 
       const existingTask = database.select('tasks', { id })[0]
 
@@ -92,9 +91,15 @@ export const routes = [
     handler: (req, res) => {
       const { id } = req.params
 
-      database.delete('tasks', id)
+      const existingTask = database.select('tasks', { id })[0]
 
-      return res.writeHead(204).end()
+      if (existingTask) {
+        database.delete('tasks', id)
+
+        return res.writeHead(204).end()
+      }
+
+      return res.writeHead(404).end()
     }
   }
 ]
