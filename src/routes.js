@@ -45,16 +45,21 @@ export const routes = [
       const { id } = req.params
       const completed_at = req.body
 
-      if (completed_at === null) {
+      const existingTask = database.select('tasks', { id })[0]
 
-        database.update('tasks', id, {
-          completed_at: new Date()
-        })
-
-        return res.writeHead(204).end()
+      if (!existingTask) {
+        return res.writeHead(404).end()
       }
 
-      return res.writeHead(400).end()
+      database.update('tasks', id, {
+        title: existingTask.title,
+        description: existingTask.description,
+        completed_at: !existingTask.completed_at,
+        created_at: existingTask.created_at,
+        updated_at: existingTask.updated_at !== undefined ? existingTask.updated_at : null
+      })
+
+      return res.writeHead(204).end()
     }
   },
   {
